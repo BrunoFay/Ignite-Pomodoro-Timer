@@ -35,6 +35,7 @@ export default function Home() {
   const [cycles, setCycles] = useState<Cycle[]>([])
   const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
   const [amountSecondsPassed, setAmountSecondsPassed] = useState(0)
+
   const { register, watch, handleSubmit, reset } = useForm<NewCycleFormData>({
     resolver: zodResolver(newCycleFormValidationSchema),
     defaultValues: {
@@ -44,20 +45,34 @@ export default function Home() {
   })
   const getActiveCycle = cycles.find((cycle) => cycle.id === activeCycleId)
 
+  /* é usado o metodo differenceInSeconds de dentro da lib de date fns, para fazer a comparação do tempo atravéz das datas, pois setInterval e setTimeout nao são precisos, eles entragam estimativas do tempo colocado e isso varia através da ram do pc */
   useEffect(() => {
+    let interval: number
     if (getActiveCycle) {
-      setInterval(() => {
+      interval = setInterval(() => {
         setAmountSecondsPassed(
           differenceInSeconds(new Date(), getActiveCycle.startDate),
         )
       }, 1000)
     }
-  }, [])
+    return () => {
+      clearInterval(interval)
+    }
+  }, [getActiveCycle])
+
   function handleSubmitForm(data: NewCycleFormData) {
-    const id = String(new Date().getDate())
-    const newCycle = { id, startDate: new Date(), ...data }
+    const id = String(new Date().getTime())
+    const newCycle: Cycle = {
+      id,
+      minutesAmount: data.minutesAmount,
+      task: data.task,
+      startDate: new Date(),
+    }
+
     setCycles((curr) => [...curr, newCycle])
     setActiveCycleId(id)
+
+    setAmountSecondsPassed(0)
     reset()
   }
   /* log para ver os erros de validação nos inputs
