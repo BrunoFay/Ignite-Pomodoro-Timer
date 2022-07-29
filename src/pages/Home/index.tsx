@@ -12,6 +12,7 @@ import {
   StartCountDown,
   TaskInput,
 } from './styles'
+
 /* como fazer validação com o zod, e como editar mensagens para ser exibidas */
 const newCycleFormValidationSchema = zod.object({
   task: zod.string().min(1, 'A tarefa precisa ter pelo menos 1 caracter'),
@@ -21,14 +22,21 @@ const newCycleFormValidationSchema = zod.object({
     .max(60, 'o intervalo precisa ser de no máximo 60 minutos'),
 })
 
+type NewCycleFormData = zod.infer<typeof newCycleFormValidationSchema>
 export default function Home() {
-  const { register, watch, handleSubmit, formState } = useForm({
-    resolver: zodResolver(newCycleFormValidationSchema),
-  })
+  const { register, watch, handleSubmit, formState } =
+    useForm<NewCycleFormData>({
+      resolver: zodResolver(newCycleFormValidationSchema),
+      defaultValues: {
+        minutesAmount: 0,
+        task: '',
+      },
+    })
+
   const task = watch('task')
   const isSubmitDisable = !task
 
-  function handleSubmitForm() { }
+  function handleSubmitForm(data: NewCycleFormData) {}
   /* log para ver os erros de validação nos inputs
   console.log(formState.errors)
   */
