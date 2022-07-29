@@ -1,7 +1,8 @@
 import { Play } from 'phosphor-react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { differenceInSeconds } from 'date-fns'
 import * as zod from 'zod'
 import {
   CountDownContainer,
@@ -27,6 +28,7 @@ interface Cycle {
   id: string
   task: string
   minutesAmount: number
+  startDate: Date
 }
 
 export default function Home() {
@@ -40,10 +42,20 @@ export default function Home() {
       task: '',
     },
   })
+  const getActiveCycle = cycles.find((cycle) => cycle.id === activeCycleId)
 
+  useEffect(() => {
+    if (getActiveCycle) {
+      setInterval(() => {
+        setAmountSecondsPassed(
+          differenceInSeconds(new Date(), getActiveCycle.startDate),
+        )
+      }, 1000)
+    }
+  }, [])
   function handleSubmitForm(data: NewCycleFormData) {
     const id = String(new Date().getDate())
-    const newCycle = { id, ...data }
+    const newCycle = { id, startDate: new Date(), ...data }
     setCycles((curr) => [...curr, newCycle])
     setActiveCycleId(id)
     reset()
@@ -53,8 +65,6 @@ export default function Home() {
   */
   const task = watch('task')
   const isSubmitDisable = !task
-
-  const getActiveCycle = cycles.find((cycle) => cycle.id === activeCycleId)
 
   const totalSeconds = getActiveCycle ? getActiveCycle.minutesAmount * 60 : 0
   const currentSeconds = getActiveCycle ? totalSeconds - amountSecondsPassed : 0
