@@ -49,19 +49,22 @@ export const Separator = styled.div`
   display: flex;
   justify-content: center;
 `
-export const StartCountDown = styled.button`
+export const BaseCountDownBtn = styled.button`
   border: solid transparent;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-weight: bold;
   padding: 1rem 2.5rem;
-  background-color: ${(props) => props.theme['green-500']};
   color: ${(props) => props.theme['gray-100']};
   border-radius: 8px;
   gap: 0.5rem;
   width: 100%;
   transition: all 0.1s;
   cursor: pointer;
+`
+export const StartCountDown = styled(BaseCountDownBtn)`
+  background-color: ${(props) => props.theme['green-500']};
   &:disabled {
     opacity: 0.7;
     cursor: not-allowed;
@@ -70,6 +73,14 @@ export const StartCountDown = styled.button`
     background-color: ${(props) => props.theme['green-700']};
   }
 `
+export const StopCountDown = styled(BaseCountDownBtn)`
+  background-color: ${(props) => props.theme['red-500']};
+
+  &:not(:disabled):hover {
+    background-color: ${(props) => props.theme['red-700']};
+  }
+`
+
 /* herança de css com style component. inherit serve para pegar o valor da mesma propriedade designada ao pai */
 const BaseInput = styled.input`
   background: transparent;
@@ -83,6 +94,9 @@ const BaseInput = styled.input`
   &:focus {
     box-shadow: none;
     border-bottom: 2px solid ${(props) => props.theme['green-500']};
+  }
+  &:disabled {
+    cursor: not-allowed;
   }
 `
 export const TaskInput = styled(BaseInput)`

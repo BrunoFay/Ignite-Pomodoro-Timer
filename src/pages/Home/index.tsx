@@ -1,8 +1,8 @@
-import { Play } from 'phosphor-react'
-import React, { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { differenceInSeconds } from 'date-fns'
+import { HandPalm, Play } from 'phosphor-react'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import * as zod from 'zod'
 import {
   CountDownContainer,
@@ -11,6 +11,7 @@ import {
   MinutesAmountInput,
   Separator,
   StartCountDown,
+  StopCountDown,
   TaskInput,
 } from './styles'
 
@@ -29,17 +30,18 @@ interface Cycle {
   task: string
   minutesAmount: number
   startDate: Date
+  interruptedDate?: Date
 }
 
 export default function Home() {
   const [cycles, setCycles] = useState<Cycle[]>([])
   const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
-  const [amountSecondsPassed, setAmountSecondsPassed] = useState(0)
+  const [amountSecondsPassed, setAmountSecondsPassed] = useState(5)
 
   const { register, watch, handleSubmit, reset } = useForm<NewCycleFormData>({
     resolver: zodResolver(newCycleFormValidationSchema),
     defaultValues: {
-      minutesAmount: 0,
+      minutesAmount: 5,
       task: '',
     },
   })
@@ -75,6 +77,16 @@ export default function Home() {
     setAmountSecondsPassed(0)
     reset()
   }
+  function handleInterruptCycle() {
+    const setInterruptedDateInCycle = cycles.map((cycle) => {
+      if (cycle.id === activeCycleId) {
+        return { ...cycle, interruptedDate: new Date() }
+      }
+      return cycle
+    })
+    setCycles(setInterruptedDateInCycle)
+    setActiveCycleId(null)
+  }
   /* log para ver os erros de validação nos inputs
   console.log(formState.errors) formState vem de dentro do useForm
   */
@@ -91,12 +103,21 @@ export default function Home() {
   const minutes = String(minutesAmount).padStart(2, '0')
   const seconds = String(secondsAmount).padStart(2, '0')
 
+  useEffect(() => {
+    if (getActiveCycle) {
+      document.title = `Pomodoro ${minutes} : ${seconds}`
+    } else {
+      document.title = `Pomodoro Timer`
+    }
+  }, [minutes, seconds, getActiveCycle])
+
   return (
     <HomeContainer>
       <form onSubmit={handleSubmit(handleSubmitForm)}>
         <FormContainer>
           <label htmlFor="taskInput">Vou trabalhar em:</label>
           <TaskInput
+            disabled={!!getActiveCycle}
             list="task-suggestions"
             id="taskInput"
             placeholder="De um nome para o seu projeto"
@@ -112,6 +133,7 @@ export default function Home() {
           <label>
             Durante
             <MinutesAmountInput
+              disabled={!!getActiveCycle}
               type="number"
               placeholder="00"
               step={5}
@@ -129,10 +151,17 @@ export default function Home() {
           <span>{seconds[0]}</span>
           <span>{seconds[1]}</span>
         </CountDownContainer>
-        <StartCountDown type="submit" disabled={isSubmitDisable}>
-          <Play size={24} />
-          Começar
-        </StartCountDown>
+        {!getActiveCycle ? (
+          <StartCountDown type="submit" disabled={isSubmitDisable}>
+            <Play size={24} />
+            Começar
+          </StartCountDown>
+        ) : (
+          <StopCountDown onClick={handleInterruptCycle} type="button">
+            <HandPalm size={24} />
+            Interromper
+          </StopCountDown>
+        )}
       </form>
     </HomeContainer>
   )
