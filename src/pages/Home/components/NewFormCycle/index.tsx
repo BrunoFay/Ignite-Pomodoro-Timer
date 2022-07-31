@@ -4,7 +4,7 @@ import { cycleContext } from '../../../../context/CycleContextProvider'
 import { FormContainer, MinutesAmountInput, TaskInput } from './style'
 
 export default function NewFormCycle() {
-  const { activeCycle } = useContext(cycleContext)
+  const { activeCycle, tasksAlreadyUsed } = useContext(cycleContext)
   const { register } = useFormContext()
   return (
     <FormContainer>
@@ -18,10 +18,9 @@ export default function NewFormCycle() {
         {...register('task')}
       />
       <datalist id="task-suggestions">
-        <option>projeto 1</option>
-        <option>projeto 2</option>
-        <option>projeto 3</option>
-        <option>projeto 4</option>
+        {tasksAlreadyUsed.map((task, index) => (
+          <option key={index}>{task}</option>
+        ))}
       </datalist>
       <label>
         Durante

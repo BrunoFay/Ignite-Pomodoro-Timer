@@ -1,4 +1,11 @@
-import { createContext, PropsWithChildren, useReducer, useState } from 'react'
+import { differenceInSeconds } from 'date-fns'
+import {
+  createContext,
+  PropsWithChildren,
+  useEffect,
+  useReducer,
+  useState,
+} from 'react'
 import {
   createNewCycleAction,
   finishCycleAction,
@@ -12,6 +19,7 @@ interface NewCycleData {
 }
 interface CyclesContextValues {
   cycles: Cycle[]
+  tasksAlreadyUsed: string[]
   activeCycleId: string | null
   activeCycle: Cycle | undefined
   amountSecondsPassed: number
@@ -22,16 +30,43 @@ interface CyclesContextValues {
 }
 
 export const cycleContext = createContext({} as CyclesContextValues)
-
+const INITIAL_CYCLE_STATE_USEREDUCER = {
+  cycles: [],
+  activeCycleId: null,
+  tasksAlreadyUsed: [],
+}
 export function CycleContextProvider({ children }: PropsWithChildren) {
-  const [amountSecondsPassed, setAmountSecondsPassed] = useState(5)
-  const [cycleState, dispatch] = useReducer(cyclesReducer, {
-    cycles: [],
-    activeCycleId: null,
-  })
-  const { cycles, activeCycleId } = cycleState
+  /* terceiro paremetro do useReducer é uma função disparada assim que o reducer é criado para recuperar os dados do reducer de outro lugar (API ou LocalStorage) */
+
+  const [cycleState, dispatch] = useReducer(
+    cyclesReducer,
+    INITIAL_CYCLE_STATE_USEREDUCER,
+    () => {
+      const cyclesInLocalStorage = localStorage.getItem(
+        '@Ignite-timer-cycleState-1.0.0',
+      )
+      if (cyclesInLocalStorage) {
+        return JSON.parse(cyclesInLocalStorage)
+      }
+      return INITIAL_CYCLE_STATE_USEREDUCER
+    },
+  )
+  console.log(cycleState)
+
+  const { cycles, activeCycleId, tasksAlreadyUsed } = cycleState
 
   const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
+  const [amountSecondsPassed, setAmountSecondsPassed] = useState(() => {
+    if (activeCycle) {
+      return differenceInSeconds(new Date(), new Date(activeCycle.startDate))
+    }
+    return 5
+  })
+
+  useEffect(() => {
+    const cyclesStateToString = JSON.stringify(cycleState)
+    localStorage.setItem('@Ignite-timer-cycleState-1.0.0', cyclesStateToString)
+  }, [cycleState])
 
   function setSecondsPassed(seconds: number) {
     setAmountSecondsPassed(seconds)
@@ -59,6 +94,7 @@ export function CycleContextProvider({ children }: PropsWithChildren) {
 
   const valueToProvide = {
     cycles,
+    tasksAlreadyUsed,
     activeCycleId,
     activeCycle,
     amountSecondsPassed,

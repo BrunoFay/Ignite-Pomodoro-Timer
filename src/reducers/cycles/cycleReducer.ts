@@ -11,6 +11,7 @@ export interface Cycle {
 }
 interface CycleReducerState {
   cycles: Cycle[]
+  tasksAlreadyUsed: string[]
   activeCycleId: string | null
 }
 
@@ -55,6 +56,7 @@ export function cyclesReducer(state: CycleReducerState, action: any) {
     case ActionTypeCycle.ADD_NEW_CYCLE:
       return produce(state, (draft) => {
         draft.cycles.push(action.payload.cycles)
+        draft.tasksAlreadyUsed.push(action.payload.cycles.task)
         draft.activeCycleId = action.payload.activeCycleId
       })
 

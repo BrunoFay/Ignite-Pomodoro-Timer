@@ -22,13 +22,14 @@ export default function CountDown({
   const seconds = String(secondsAmount).padStart(2, '0')
 
   /* é usado o metodo differenceInSeconds de dentro da lib de date fns, para fazer a comparação do tempo atravéz das datas, pois setInterval e setTimeout nao são precisos, eles entragam estimativas do tempo colocado e isso varia através da ram do pc */
+
   useEffect(() => {
     let interval: number
     if (activeCycle) {
       interval = setInterval(() => {
         const secondsDiff = differenceInSeconds(
           new Date(),
-          activeCycle.startDate,
+          new Date(activeCycle.startDate),
         )
         if (secondsDiff >= totalSeconds) {
           handleFinishCycle()
