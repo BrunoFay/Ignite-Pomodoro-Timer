@@ -1,13 +1,6 @@
 import { createContext, PropsWithChildren, useReducer, useState } from 'react'
+import { ActionTypeCycle, Cycle, cyclesReducer } from '../reducers/cycleReducer'
 
-export interface Cycle {
-  id: string
-  task: string
-  minutesAmount: number
-  startDate: Date
-  interruptedDate?: Date
-  finishedDate?: Date
-}
 interface NewCycleData {
   task: string
   minutesAmount: number
@@ -22,58 +15,16 @@ interface CyclesContextValues {
   finishCycle: () => void
   createNewCycle: (data: NewCycleData) => void
 }
-interface CycleReducerState {
-  cycles: Cycle[]
-  activeCycleId: string | null
-}
 
 export const cycleContext = createContext({} as CyclesContextValues)
 
 export function CycleContextProvider({ children }: PropsWithChildren) {
   const [amountSecondsPassed, setAmountSecondsPassed] = useState(5)
-  const [cycleState, dispatch] = useReducer(
-    (state: CycleReducerState, action: any) => {
-      switch (action.type) {
-        case 'ADD_NEW_CYCLE':
-          return {
-            ...state,
-            cycles: [...state.cycles, action.payload.cycles],
-            activeCycleId: action.payload.activeCycleId,
-          }
-        case 'INTERRUPT_CYCLE':
-          return {
-            ...state,
-            cycles: state.cycles.map((cycle) => {
-              if (cycle.id === state.activeCycleId) {
-                return { ...cycle, interruptedDate: new Date() }
-              }
-              return cycle
-            }),
-            activeCycleId: null,
-          }
-        case 'FINISH_CYCLE':
-          return {
-            ...state,
-            cycles: state.cycles.map((cycle) => {
-              if (cycle.id === state.activeCycleId) {
-                return { ...cycle, finishedDate: new Date() }
-              }
-              return cycle
-            }),
-            activeCycleId: null,
-          }
-
-        default:
-          return state
-      }
-    },
-    {
-      cycles: [],
-      activeCycleId: null,
-    },
-  )
-  const { cycles, activeCycleId }: CycleReducerState = cycleState
-  console.log(cycles)
+  const [cycleState, dispatch] = useReducer(cyclesReducer, {
+    cycles: [],
+    activeCycleId: null,
+  })
+  const { cycles, activeCycleId } = cycleState
 
   const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
 
@@ -89,7 +40,7 @@ export function CycleContextProvider({ children }: PropsWithChildren) {
       startDate: new Date(),
     }
     dispatch({
-      type: 'ADD_NEW_CYCLE',
+      type: ActionTypeCycle.ADD_NEW_CYCLE,
       payload: { cycles: newCycle, activeCycleId: id },
     })
 
@@ -98,13 +49,13 @@ export function CycleContextProvider({ children }: PropsWithChildren) {
 
   function interruptCycle() {
     dispatch({
-      type: 'INTERRUPT_CYCLE',
+      type: ActionTypeCycle.INTERRUPT_CYCLE,
     })
   }
 
   function finishCycle() {
     dispatch({
-      type: 'FINISH_CYCLE',
+      type: ActionTypeCycle.FINISH_CYCLE,
     })
   }
 
