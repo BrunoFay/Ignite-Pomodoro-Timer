@@ -1,5 +1,10 @@
 import { createContext, PropsWithChildren, useReducer, useState } from 'react'
-import { ActionTypeCycle, Cycle, cyclesReducer } from '../reducers/cycleReducer'
+import {
+  createNewCycleAction,
+  finishCycleAction,
+  interruptCycleAction,
+} from '../reducers/cycles/actions'
+import { Cycle, cyclesReducer } from '../reducers/cycles/cycleReducer'
 
 interface NewCycleData {
   task: string
@@ -39,24 +44,17 @@ export function CycleContextProvider({ children }: PropsWithChildren) {
       task: data.task,
       startDate: new Date(),
     }
-    dispatch({
-      type: ActionTypeCycle.ADD_NEW_CYCLE,
-      payload: { cycles: newCycle, activeCycleId: id },
-    })
+    dispatch(createNewCycleAction(newCycle, id))
 
     setSecondsPassed(0)
   }
 
   function interruptCycle() {
-    dispatch({
-      type: ActionTypeCycle.INTERRUPT_CYCLE,
-    })
+    dispatch(interruptCycleAction())
   }
 
   function finishCycle() {
-    dispatch({
-      type: ActionTypeCycle.FINISH_CYCLE,
-    })
+    dispatch(finishCycleAction())
   }
 
   const valueToProvide = {

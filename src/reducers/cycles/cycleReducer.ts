@@ -1,11 +1,5 @@
-export enum ActionTypeCycle {
-  // eslint-disable-next-line no-unused-vars
-  ADD_NEW_CYCLE = 'ADD_NEW_CYCLE',
-  // eslint-disable-next-line no-unused-vars
-  INTERRUPT_CYCLE = 'INTERRUPT_CYCLE',
-  // eslint-disable-next-line no-unused-vars
-  FINISH_CYCLE = 'FINISH_CYCLE',
-}
+import { ActionTypeCycle } from './actions'
+
 export interface Cycle {
   id: string
   task: string
