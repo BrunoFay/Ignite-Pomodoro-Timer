@@ -31,12 +31,14 @@ interface Cycle {
   minutesAmount: number
   startDate: Date
   interruptedDate?: Date
+  finishedDate?: Date
 }
 
 export default function Home() {
   const [cycles, setCycles] = useState<Cycle[]>([])
   const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
   const [amountSecondsPassed, setAmountSecondsPassed] = useState(5)
+  const getActiveCycle = cycles.find((cycle) => cycle.id === activeCycleId)
 
   const { register, watch, handleSubmit, reset } = useForm<NewCycleFormData>({
     resolver: zodResolver(newCycleFormValidationSchema),
@@ -45,22 +47,6 @@ export default function Home() {
       task: '',
     },
   })
-  const getActiveCycle = cycles.find((cycle) => cycle.id === activeCycleId)
-
-  /* é usado o metodo differenceInSeconds de dentro da lib de date fns, para fazer a comparação do tempo atravéz das datas, pois setInterval e setTimeout nao são precisos, eles entragam estimativas do tempo colocado e isso varia através da ram do pc */
-  useEffect(() => {
-    let interval: number
-    if (getActiveCycle) {
-      interval = setInterval(() => {
-        setAmountSecondsPassed(
-          differenceInSeconds(new Date(), getActiveCycle.startDate),
-        )
-      }, 1000)
-    }
-    return () => {
-      clearInterval(interval)
-    }
-  }, [getActiveCycle])
 
   function handleSubmitForm(data: NewCycleFormData) {
     const id = String(new Date().getTime())
@@ -77,6 +63,7 @@ export default function Home() {
     setAmountSecondsPassed(0)
     reset()
   }
+
   function handleInterruptCycle() {
     const setInterruptedDateInCycle = cycles.map((cycle) => {
       if (cycle.id === activeCycleId) {
@@ -85,6 +72,18 @@ export default function Home() {
       return cycle
     })
     setCycles(setInterruptedDateInCycle)
+    setActiveCycleId(null)
+  }
+
+  function handleFinishCycle() {
+    setCycles((state) =>
+      state.map((cycle) => {
+        if (cycle.id === activeCycleId) {
+          return { ...cycle, finishedDate: new Date() }
+        }
+        return cycle
+      }),
+    )
     setActiveCycleId(null)
   }
   /* log para ver os erros de validação nos inputs
@@ -102,6 +101,29 @@ export default function Home() {
   /* padStart faz com que voce complete uma string com um valor, no primeiro parametro é o tamanho da string e no segundo é o valor que sera usado para preencher */
   const minutes = String(minutesAmount).padStart(2, '0')
   const seconds = String(secondsAmount).padStart(2, '0')
+
+  /* é usado o metodo differenceInSeconds de dentro da lib de date fns, para fazer a comparação do tempo atravéz das datas, pois setInterval e setTimeout nao são precisos, eles entragam estimativas do tempo colocado e isso varia através da ram do pc */
+  useEffect(() => {
+    let interval: number
+    if (getActiveCycle) {
+      interval = setInterval(() => {
+        const secondsDiff = differenceInSeconds(
+          new Date(),
+          getActiveCycle.startDate,
+        )
+        if (secondsDiff >= totalSeconds) {
+          handleFinishCycle()
+          clearInterval(interval)
+          setAmountSecondsPassed(totalSeconds)
+        } else {
+          setAmountSecondsPassed(secondsDiff)
+        }
+      }, 1000)
+    }
+    return () => {
+      clearInterval(interval)
+    }
+  }, [getActiveCycle])
 
   useEffect(() => {
     if (getActiveCycle) {
