@@ -13,6 +13,7 @@ interface NewCycleData {
   minutesAmount: number
 }
 interface CyclesContextValues {
+  cycles: Cycle[]
   activeCycleId: string | null
   activeCycle: Cycle | undefined
   catchActiveCycleId: (s: string | null) => void
@@ -27,7 +28,7 @@ export const cycleContext = createContext({} as CyclesContextValues)
 
 export function CycleContextProvider({ children }: PropsWithChildren) {
   const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
-  const [activeCycle, setActiveCycle] = useState<Cycle | undefined>()
+  const [activeCycle, setActiveCycle] = useState<Cycle | undefined>(undefined)
   const [amountSecondsPassed, setAmountSecondsPassed] = useState(5)
   const [cycles, setCycles] = useState<Cycle[]>([])
 
@@ -36,7 +37,7 @@ export function CycleContextProvider({ children }: PropsWithChildren) {
   }
   useEffect(() => {
     getActiveCycle()
-  }, [])
+  }, [cycles, activeCycleId])
   function catchActiveCycleId(s: string | null) {
     setActiveCycleId(s)
   }
@@ -82,6 +83,7 @@ export function CycleContextProvider({ children }: PropsWithChildren) {
   }
 
   const valueToProvide = {
+    cycles,
     activeCycleId,
     catchActiveCycleId,
     activeCycle,
