@@ -41,7 +41,7 @@ export const HistoryList = styled.div`
       }
     }
     td {
-      background-color: ${(props) => props.theme['gray-700']};
+      background-color: ${(props) => props.theme['bg-countdown']};
       border-top: 4px solid ${(props) => props.theme['gray-800']};
       padding: 1rem;
       font-size: 0.875rem;
