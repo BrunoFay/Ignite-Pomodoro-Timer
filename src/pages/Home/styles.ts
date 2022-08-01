@@ -22,7 +22,7 @@ export const BaseCountDownBtn = styled.button`
   justify-content: center;
   font-weight: bold;
   padding: 1rem 2.5rem;
-  color: ${(props) => props.theme['gray-100']};
+  color: ${(props) => props.theme.white};
   border-radius: 8px;
   gap: 0.5rem;
   width: 100%;
@@ -55,7 +55,7 @@ export const BaseInput = styled.input`
   border-bottom: 2px solid ${(props) => props.theme['gray-500']};
   font-weight: inherit;
   padding: 0 0.5rem;
-  color: ${(props) => props.theme['gray-100']};
+  color: ${(props) => props.theme['color-body']};
   transition: all 0.1s;
   &:focus {
     box-shadow: none;

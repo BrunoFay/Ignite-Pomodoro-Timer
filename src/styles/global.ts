@@ -12,11 +12,11 @@ export const GlobalStyle = createGlobalStyle`
 }
 
 body{
-  background: ${(props) => props.theme['gray-900']};
-  color: ${(props) => props.theme['gray-300']};
+  background: ${(props) => props.theme['bg-body']};
+  color: ${(props) => props.theme['color-body']};
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
+  overflow: hidden;
 }
 
 body,input,textarea,button {

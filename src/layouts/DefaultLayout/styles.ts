@@ -5,7 +5,7 @@ export const LayoutContainer = styled.div`
   max-width: 74rem;
   height: calc(100% - 10rem);
   margin: 5rem auto;
-  background: ${(props) => props.theme['gray-800']};
+  background: ${(props) => props.theme['bg-main']};
   border-radius: 8px;
   display: flex;
   padding: 2.5rem;

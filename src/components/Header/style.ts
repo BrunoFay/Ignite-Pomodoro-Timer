@@ -9,14 +9,21 @@ export const HeaderContainer = styled.header`
     display: flex;
     gap: 0.5rem;
   }
-
-  a {
+  button {
+    background-color: transparent;
+    border-style: none;
+    &:focus {
+      color: ${(props) => props.theme['green-500']};
+    }
+  }
+  a,
+  button {
     width: 3rem;
     height: 3rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: ${(props) => props.theme['gray-100']};
+    color: ${(props) => props.theme['color-body']};
     border-bottom: 3px solid transparent;
     border-top: 3px solid transparent;
     border-radius: 3px;

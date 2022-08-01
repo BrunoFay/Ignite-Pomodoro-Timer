@@ -17,7 +17,7 @@ export const FormContainer = styled.div`
   justify-content: center;
   flex-wrap: wrap;
   gap: 0.5rem;
-  color: ${(props) => props.theme['gray-100']};
+  color: ${(props) => props.theme['color-body']};
   font-size: 1.125rem;
   font-weight: bold;
   .taskLabel {
